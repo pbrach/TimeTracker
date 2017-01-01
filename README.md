@@ -22,7 +22,7 @@ This is a leisure project to practice some python 3 and tkinter.
     (The license can be found in TimeTracker/doc/license.md)
     
 
-##Installation/Dependencies
+##Installation/Dependencies/Starting
 0. Operating System: TimeTracker runs on **Windows**, **Mac** and **Linux**.
 1. Denpendencies: Have python 3 installed
 2. _**On linux**_ make sure that tkinter is installed (on Debian/Ubuntu this 
