@@ -331,7 +331,7 @@ class TimeTable:
 
     def __addEmptyRow(self, *args):
 
-        newDate = datetime.combine( self.getMostRecentDate() + timedelta(days=1), time() )
+        newDate = datetime.combine( datetime.today().date(), time() )
         newSpan = TimeSpan(newDate, newDate)
 
         self.track.addTimeSpan(newSpan)
