@@ -14,6 +14,19 @@ def _durationToStr(duration: timedelta):
         s = ("%d day%s, " % plural(duration.days)) + s
     return s
 
+class ResourcesContext:
+
+    DeleteImage = None
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def Initialize():
+        ResourcesContext.DeleteImage = PhotoImage(file="../resources/delete-16.png")
+
+
+
 class TableRow:
 
     # TableRow -
@@ -25,6 +38,7 @@ class TableRow:
         frame.grid_columnconfigure(2, weight=1)
         frame.grid_columnconfigure(3, weight=1)
         frame.grid_columnconfigure(4, weight=1)
+        frame.grid_columnconfigure(5, weight=1)
 
         frame['borderwidth'] = 2
         frame['relief'] = "groove"
@@ -126,7 +140,7 @@ class TableRow:
         if (newTime != self.timeSpan.EndTime):
             self.timeSpan.EndTime = newTime
 
-            self.re4freshView()
+            self.refreshView()
 
     # TableRow -
     def __readDescription(self, *args):
@@ -160,12 +174,14 @@ class RowContainer:
 
         self.date = date
         self.track = track
+        self.spans = spans
+        self.totalTimeText = StringVar()
 
         self.tableRows = list()
         self.totalDurationLabel = None
         self.dateLabel = None
 
-        self._createDateContainer(spans)
+        self._createDateContainer()
         self._rowIdx = -1
 
 
@@ -183,32 +199,45 @@ class RowContainer:
 
 
     # RowContainer - _createDateContainer
-    def _createDateContainer(self, spans):
+    def _createDateContainer(self):
 
         # 2.) Setup the label row for the container
-        self.dateLabel = ttk.Label(self.frame, text=self.date.strftime("%Y-%m-%d"), foreground="black", background="gray")
-        self.dateLabel.grid(column=0, row=self.rowIdx, sticky=(W) )
+        labelText = self.date.strftime("%Y-%m-%d (%a)")
+        self.dateLabel = ttk.Label(self.frame, text=labelText, foreground="black", background="gray", justify="left")
+        self.dateLabel.grid(column=0, row=self.rowIdx, sticky=(E,W) )
+
+        # 4.) Create a total hours row
+        self.totalTimeText.set( "Total: " + _durationToStr( self._getTotalDuration() ) )
+        self.totalDurationLabel = ttk.Label(self.frame, textvariable=self.totalTimeText, foreground="black", background="gray", justify="right")
+        self.totalDurationLabel.grid( column=1, row=self.rowIdx, sticky=(E,W) )
+
         self.rowIdx += 1
 
         # 3.) Create rows for every span
-        for span in spans:
+        for span in self.spans:
+            span.RegisterTimeChangedHandler(self._updateTotalTime)
+
             tr = TableRow(self.frame, span)
-            tr.frame.grid(column=0, row=self.rowIdx)
+            tr.frame.grid(column=0, columnspan=2, row=self.rowIdx)
+
+            def deleteAction(*args):
+                self.track.removeTimeSpan(span)
+
+            deleteButton = ttk.Button(self.frame, image=ResourcesContext.DeleteImage, command=deleteAction)
+            deleteButton.grid(column=2, row=self.rowIdx)
 
             self.tableRows.append(tr)
             self.rowIdx += 1
 
-        # 4.) Create a total hours row
-        durSt = _durationToStr( self._getTotalDuration(spans) )
-        self.totalDurationLabel = ttk.Label(self.frame, text=durSt, foreground="black", background="gray")
-        self.totalDurationLabel.grid( column=0, row=self.rowIdx, sticky=(E) )
 
+    def _updateTotalTime(self, span):
+        self.totalTimeText.set("Total: " + _durationToStr(self._getTotalDuration()))
 
     # RowContainer - _getTotalDuration
-    def _getTotalDuration(self, spans):
+    def _getTotalDuration(self):
         totalOfDay = timedelta()
 
-        for span in spans:
+        for span in self.spans:
             totalOfDay += span.Duration
 
         return totalOfDay
@@ -221,6 +250,7 @@ class RowContainer:
 class TimeTable:
     # TimeTable - __init__
     def  __init__(self, root : Frame, in_track: TimeTrack):
+        ResourcesContext.Initialize()
         self.rowIdx = 0
         self.dateContainers = dict()
 
@@ -229,6 +259,7 @@ class TimeTable:
         self.frame['relief'] = "groove"
 
         self.track = in_track
+        self.track.registerNewSpanDeletedHandler( self._hanleSpanRemoved)
 
         self.header = self.__createRowHeader(self.frame, "Date", "Start", "End", "Description", "Hours")
         self.header.grid(column=0, row=self.rowIdx, sticky=(N, W, E, S))
@@ -237,6 +268,7 @@ class TimeTable:
         self._createContainer()
 
         self._createFooter()
+
 
 
     # TimeTable - _createDateRows
@@ -263,6 +295,9 @@ class TimeTable:
         # 1.) refresh the view
         self.refreshView()
 
+    def _hanleSpanRemoved(self, span):
+        # 1.) refresh the view
+        self.refreshView()
 
     def refreshView(self):
         # 1.) destroy all

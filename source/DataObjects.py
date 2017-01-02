@@ -183,6 +183,7 @@ class TimeTrack:
     def __init__(self, name :str = "Unknown track", timeSpans : [TimeSpan] = list()):
         self.name = name
         self._timeSpans = timeSpans
+        self._spanDeletedHandlers = list()
 
 
     def addTimeSpan(self, timeSpan : TimeSpan):
@@ -190,7 +191,14 @@ class TimeTrack:
 
     def removeTimeSpan(self, timeSpan: TimeSpan):
         self._timeSpans.remove(timeSpan)
+        self._fireSpanRemoved(timeSpan)
 
+    def _fireSpanRemoved(self, span):
+        for func in self._spanDeletedHandlers:
+            res = func(span)
+
+    def registerNewSpanDeletedHandler(self, handler):
+        _registerNewHandler(self._spanDeletedHandlers, handler)
 
 
     def getTotalTime(self, fromDT : datetime = None, toDT: datetime = None) -> timedelta:
