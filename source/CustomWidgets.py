@@ -209,7 +209,7 @@ class RowContainer:
         # 2.) Create a total hours row
         self.totalTimeText.set( "Total: " + _durationToStr( self._getTotalDuration() ) )
         self.totalDurationLabel = ttk.Label(self.frame, textvariable=self.totalTimeText, foreground="black", background="gray", justify="right")
-        self.totalDurationLabel.grid( column=1, row=self.rowIdx, sticky=(E,W) )
+        self.totalDurationLabel.grid( column=1, columnspan=2, row=self.rowIdx, sticky=(E,W) )
 
         self.rowIdx += 1
 
