@@ -201,12 +201,12 @@ class RowContainer:
     # RowContainer - _createDateContainer
     def _createDateContainer(self):
 
-        # 2.) Setup the label row for the container
+        # 1.) Setup the label row for the container
         labelText = self.date.strftime("%Y-%m-%d (%a)")
         self.dateLabel = ttk.Label(self.frame, text=labelText, foreground="black", background="gray", justify="left")
         self.dateLabel.grid(column=0, row=self.rowIdx, sticky=(E,W) )
 
-        # 4.) Create a total hours row
+        # 2.) Create a total hours row
         self.totalTimeText.set( "Total: " + _durationToStr( self._getTotalDuration() ) )
         self.totalDurationLabel = ttk.Label(self.frame, textvariable=self.totalTimeText, foreground="black", background="gray", justify="right")
         self.totalDurationLabel.grid( column=1, row=self.rowIdx, sticky=(E,W) )
