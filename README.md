@@ -1,6 +1,6 @@
 # TimeTracker
 
-A simple simple tkinter GUI based time tracking tool to record your working or excercise times.
+A simple GUI based time tracking tool to record your working or excercise times.
 This is a cross plattform leisure project to practice some python 3 and tkinter. 
 
 ##License
