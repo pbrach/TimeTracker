@@ -1,7 +1,8 @@
-# TimeTracker
+# TimeTracker 
+#### by Hans-Philipp Brachvogel, Dec. 2016
 
 A simple GUI based time tracking tool to record your working or excercise times.
-This is a cross plattform leisure project to practice some python 3 and tkinter. 
+This is a cross plattform fun project of me to practice some python 3 and tkinter. 
 
 ##License
     Copyright (C) 2017  Hans-Philipp Brachvogel
