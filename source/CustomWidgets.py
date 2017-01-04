@@ -169,8 +169,8 @@ class RowContainer:
     def  __init__(self, root : Frame, date, spans, track):
         self.rowIdx = 0
         self.frame = ttk.Frame(root, padding="2 2 2 2")
-        self.frame['borderwidth'] = 2
-        self.frame['relief'] = "groove"
+        # self.frame['borderwidth'] = 2
+        # self.frame['relief'] = "groove"
 
         self.date = date
         self.track = track
@@ -251,35 +251,63 @@ class TimeTable:
     # TimeTable - __init__
     def  __init__(self, root : Frame, in_track: TimeTrack):
         ResourcesContext.Initialize()
-        self.rowIdx = 0
+
         self.dateContainers = dict()
 
         self.frame = ttk.Frame(root, padding="2 2 2 2")
-        self.frame['borderwidth'] = 2
-        self.frame['relief'] = "groove"
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.rowconfigure(0, weight=0)
+        self.frame.rowconfigure(1, weight=1)
+        self.frame.rowconfigure(2, weight=0)
+        # self.frame['borderwidth'] = 20
+        # self.frame['relief'] = "groove"
 
         self.track = in_track
         self.track.registerNewSpanDeletedHandler( self._hanleSpanRemoved)
 
         self.header = self.__createRowHeader(self.frame, "Date", "Start", "End", "Description", "Hours")
-        self.header.grid(column=0, row=self.rowIdx, sticky=(N, W, E, S))
-        self.rowIdx += 1
+        self.header.grid(column=0, row=0, sticky=(N, W, E))
+
+
+        # Add scrollbar around the table:
+        vbar = ttk.Scrollbar(self.frame, orient=VERTICAL)
+        vbar.grid(column=1, row=1, sticky=(N,S))
+        self._canvas = Canvas(self.frame, yscrollcommand=vbar.set)
+        vbar.config(command=self._canvas.yview)
+        self._canvas['borderwidth'] = 2
+        self._canvas['relief'] = "groove"
+
+        self._canvas.grid(column=0, row=1, sticky=(N, W, E, S))
+        self._canvas.columnconfigure(0, weight=1)
+        self._canvas.rowconfigure(0, weight=1)
+
+        self.tableFrame = ttk.Frame(self._canvas)
+        self.tableFrame.grid(column=0, row=0, )
+        self.tableFrame.configure(height=800)
+
+        self._frame_id = self._canvas.create_window(0, 0, window=self.tableFrame, anchor=N+W)
+        self._canvas.bind("<Configure>", self.resize_frame)
+
 
         self._createContainer()
-
         self._createFooter()
 
 
+    def resize_frame(self, e):
+        # self._canvas.itemconfig(self._frame_id, height=e.height, width=e.width)
+        self._canvas.config(scrollregion=self.tableFrame.bbox(ALL))
 
     # TimeTable - _createDateRows
     def _createContainer(self):
 
+        rowIdx = 0
+
         for date, spans in self.track.getSpansPerDate().items():
 
-            self.dateContainers[date] = RowContainer(self.frame, date, spans, self.track)
+            self.dateContainers[date] = RowContainer(self.tableFrame, date, spans, self.track)
 
-            self.dateContainers[date].RowIndex = self.rowIdx
-            self.rowIdx += 1
+            self.dateContainers[date].RowIndex = rowIdx
+            rowIdx += 1
 
             for span in spans:
                 span.RegisterDateChangedHandler( self._handleDateChanged)
@@ -310,6 +338,9 @@ class TimeTable:
         self._createContainer()
         self._correctRowIndices()
 
+        bb_ox = self.tableFrame.bbox(ALL)
+        self._canvas.config(scrollregion=bb_ox)
+
 
 
     # TimeTable - _correctRowIndices
@@ -318,8 +349,6 @@ class TimeTable:
 
         for (idx, date) in zip(range(1, len(sortedDates)+1 ), sortedDates):
             self.dateContainers[date].RowIndex = idx
-
-        self.footer.grid(column=0, row=len(sortedDates)+1, sticky=(N, W, E, S))
 
 
     # TimeTable - __createRowHeader
@@ -346,7 +375,7 @@ class TimeTable:
         frame.columnconfigure(3, weight=20)
         frame.columnconfigure(4, weight=1)
 
-        frame['borderwidth'] = 6
+        frame['borderwidth'] = 2
         frame['relief'] = "groove"
 
         return frame
@@ -357,8 +386,7 @@ class TimeTable:
         label = ttk.Label(self.footer, text="add new", foreground="black", background="gray")
         label.grid(column=0, row=0, sticky=( W))
 
-        self.footer.grid(column=0, row=self.rowIdx, sticky=(N, W, E, S))
-        self.rowIdx += 1
+        self.footer.grid(column=0, row=2, sticky=(W, E, S))
 
         self.footer.bind('<ButtonPress-1>', self.__addEmptyRow)
         label.bind('<ButtonPress-1>', self.__addEmptyRow)
