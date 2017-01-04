@@ -26,14 +26,14 @@ This is a cross plattform fun project of me to practice some python 3 and tkinte
 ##Installation/Dependencies/Starting
 0. Operating System: TimeTracker runs on **Windows**, **Mac** and **Linux**.
 1. Denpendencies: Have python 3 installed
-2. _**On linux**_ make sure that tkinter is installed (on Debian/Ubuntu this 
-   is a separate package although it is a native python lib). On Debian/Ubuntu/Mint systems you can install it via *apt-get* and the package *python3-tk*:
+2. *On linux* make sure that _**tkinter**_ is installed. On Debian based systems this 
+   is a separate package that is not automatically installed although tkinter is a native python library. On Debian/Ubuntu/Mint systems you can install it via *apt-get* and the package *python3-tk*. For example via:
    
    ```
    sudo apt-get install python3-tk
    ```
    
-3. To start the application navigate via command line to _TimeTracker/source_ and type:
+3. To start the application open a terminal/commandline window, navigate to _TimeTracker/source_ and type:
     ```
     python main.py
     ```
