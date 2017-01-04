@@ -4,7 +4,7 @@ A simple GUI based time tracking tool to record your working or excercise times.
 This is a cross plattform leisure project to practice some python 3 and tkinter. 
 
 ##License
-    Copyright (C) 2016  Hans-Philipp Brachvogel
+    Copyright (C) 2017  Hans-Philipp Brachvogel
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
